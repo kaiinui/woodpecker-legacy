@@ -11,9 +11,8 @@ module WoodPecker
     def preprocess
       append_base_tag
       append_javascript_tag("//ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js")
-      append_javascript_tag("http://0.0.0.0:9393/assets/xpath.js")
-      append_javascript_tag("http://0.0.0.0:9393/assets/tinyquery.js")
-      append_javascript_tag("http://0.0.0.0:9393/assets/woodpecker.js")
+      append_javascript_tag("http://0.0.0.0:9393/assets/all.js")
+      append_stylesheet_tag("http://0.0.0.0:9393/assets/all.css")
     end
 
     def html
@@ -32,6 +31,10 @@ module WoodPecker
 
     def append_javascript_tag(src)
       headers.append("<script src='#{src}' type='text/javascript'></script>")
+    end
+
+    def append_stylesheet_tag(src)
+      headers.append("<link rel='stylesheet' type='text/css' href='#{src}' />")
     end
   end
 end

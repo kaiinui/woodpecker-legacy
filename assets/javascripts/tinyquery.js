@@ -33,13 +33,3 @@ E[P].on=function(type, callback){
     this.addEventListener(type, callback);
     return this;
 };
-
-// @extension
-
-Array.prototype.map = function(blk){
-    var result = [];
-    this.forEach(function(el){
-        result += blk(el);
-    });
-    return result;
-}

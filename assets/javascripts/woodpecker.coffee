@@ -10,6 +10,7 @@ window.WoodPecker = {}
 WoodPecker.initalize = ->
   ["a", "p", "div", "span", "img", "iframe", "li", "dt", "dd", "h1", "h2", "h3", "h4", "h5", "h6"].forEach (elName)->
     WoodPecker._registElementEvents(elName)
+  WoodPecker.UI.addShowSampleJSONButton()
 
 # @private
 
@@ -44,16 +45,10 @@ WoodPecker.UI = {}
 
 # @public
 
-#**JQUERY
 WoodPecker.UI.addOverlayAt = (el)->
   $el = $(el)
   $offset = $el.offset()
-  $("<div />").css(
-    "background": "yellow" # [TODO]: CSS stylize
-    "opacity": 0.5
-    "boxShadow": "0 1px 2px rgba(0,0,0,.25)"
-    "zIndex": 23929393
-    "position": "absolute"
+  $("<div class='wp-overlay-label'/>").css(
     "left": $offset.left
     "top": $offset.top
     "width": $el.width()
@@ -61,37 +56,52 @@ WoodPecker.UI.addOverlayAt = (el)->
   ).appendTo $("body")
   WoodPecker.UI._addFieldNameInputAt(el)
 
+WoodPecker.UI.addShowSampleJSONButton = ->
+  $("<a href='' class='wp-button-show-sample' />").text("Show").on('click', (e)->
+    e.preventDefault()
+    WoodPecker.UI._showSampleJSON()
+  ).appendTo $("body")
+
+# @private
+
+WoodPecker.UI._showSampleJSON = ->
+  json = WoodPecker.Field.sampleJSONHTML()
+  $("<div id='_wp_samplejson_overlay' class='wp-overlay-all' />").append(
+    $("<span />").html(json).prepend(
+      $("<h3 />").text("JSON")
+    )
+  ).append(
+    $("<a href=''/>").addClass("wp-button-close").text("x").on('click', (e)->
+      e.preventDefault()
+      $("#_wp_samplejson_overlay").remove()
+    )
+  ).appendTo $("body")
+
 # @private
 
 WoodPecker.UI._addFieldNameInputAt = (el)->
   $el = $(el)
   $offset = $el.offset()
-  $("<input type='text' placeholder='Field Name'/>").css(
-    "position": "absolute"
-    "zIndex": 33929392
-    "height": 20
+  $text = $el.text()
+  $("<input type='text' class='wp-input-field' placeholder='Field Name'/>").css(
     "left": $offset.left
     "top": $offset.top - 30
   ).on('keydown', (e)->
     return unless e.keyCode == 13
     name = e.target.value
     WoodPecker.Field.setItem(
-      name: name
-      xpath: getXPath(el)
+      "text": $text
+      "name": name
+      "xpath": getXPath(el).replace(/"/g, "'")
     )
     WoodPecker.UI._addFieldNameLabelAt name, el
     $(this).remove()
-  ).appendTo $("body")
+  ).appendTo($("body")).focus()
 
 WoodPecker.UI._addFieldNameLabelAt = (name, el)->
   $el = $(el)
   $offset = $el.offset()
-  $("<span />").css(
-    "background": "orange"
-    "boxShadow": "0 1px 2px rgba(0,0,0,.25)"
-    "color": "white"
-    "position": "absolute"
-    "zIndex": 425343434
+  $("<span class='wp-field-name-label' />").css(
     "left": $offset.left - 10
     "top": $offset.top - 10
   ).text(name).appendTo $("body")
@@ -111,12 +121,27 @@ WoodPecker.Field.setItem = (item)->
 
 # @private
 
-WoodPecker.Field._toYAML = ->
-  WoodPecker.Field.all.map (field)->
+WoodPecker.Field._toSchemaYAML = ->
+  WoodPecker.Field.all().map( (field)->
     "#{field.name}: #{field.xpath}"
+  ).join("\n")
 
+WoodPecker.Field._toSchemaJSON = ->
+  json = {}
+  WoodPecker.Field.all().forEach (field)->
+    json[field.name] = field.xpath
+  JSON.stringify json, null, 4
 
-  # @extension
+WoodPecker.Field.sampleJSON = ->
+  json = {}
+  WoodPecker.Field.all().forEach (field)->
+    json[field.name] = field.text
+  JSON.stringify json, null, 4
+
+WoodPecker.Field.sampleJSONHTML = ->
+  WoodPecker.Field.sampleJSON().replace(/( )/gm,"&nbsp;").replace(/(\r\n|\n|\r)/gm,"<br />")
+
+# @extension
 
 Element.prototype.hasAnyTextAtRoot = ->
   this.textAtRoot().removeSpaces() != ""
