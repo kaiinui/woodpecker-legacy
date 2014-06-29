@@ -21,6 +21,12 @@ $zbase: 1000000000;
   height: 20px;
 }
 
+.wp-input-select{
+  position: absolute;
+  z-index: $zbase + 12;
+  height: 20px;
+}
+
 
 .wp-field-name-label{
   background: orange;
@@ -38,7 +44,7 @@ $zbase: 1000000000;
   background: rgba(0,0,0,0.9);
   color: white;
   position: fixed;
-  z-index: $zbase + 10;
+  z-index: $zbase + 1000;
   left: 0;
   top: 0;
   width: 100%;

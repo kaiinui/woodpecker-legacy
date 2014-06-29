@@ -64,7 +64,7 @@ WoodPecker.UI.addOverlayAt = (el)->
     "width": $el.width()
     "height": $el.height()
   ).appendTo $("body")
-  WoodPecker.UI._addFieldNameInputAt(el)
+  WoodPecker.UI._addFieldNameSelectAt(el)
 
 WoodPecker.UI.addShowSampleJSONButton = ->
   return if $(".wp-button-show-sample").size() > 0
@@ -94,6 +94,31 @@ WoodPecker.UI._showSampleJSON = ->
     )
   ).appendTo $("body")
 
+# [FIXME] DRY it
+WoodPecker.UI._addFieldNameSelectAt = (el)->
+  $el = $(el)
+  $offset = $el.offset()
+  text = $el.text()
+  $_el = $("<select class='wp-input-select'>").css(
+    left: $offset.left
+    top: $offset.top - 20
+  )
+  $_el.append($("<option></option>"))
+  WoodPecker.Field.fieldNames().forEach (name)->
+    return if WoodPecker.Field.hasItem name
+    $_el.append $("<option value='#{name}'>#{name}</option>")
+  $_el.on 'change', ->
+    name = this.value
+    WoodPecker.Field.setItem(
+      text: text
+      name: name
+      xpath: getXPath(el).espaceDoubleQuotation()
+    )
+    WoodPecker.UI.addShowSampleJSONButton()
+    WoodPecker.UI._addFieldNameLabelAt name, el
+    $(this).remove()
+  $_el.appendTo $("body")
+
 WoodPecker.UI._addFieldNameInputAt = (el)->
   $el = $(el)
   $offset = $el.offset()
@@ -107,7 +132,7 @@ WoodPecker.UI._addFieldNameInputAt = (el)->
     WoodPecker.Field.setItem(
       "text": $text
       "name": name
-      "xpath": getXPath(el).replace(/"/g, "'")
+      "xpath": getXPath(el).espaceDoubleQuotation()
     )
     WoodPecker.UI.addShowSampleJSONButton()
     WoodPecker.UI._addFieldNameLabelAt name, el
@@ -135,6 +160,9 @@ WoodPecker.Field.all = ->
 WoodPecker.Field.setItem = (item)->
   WoodPecker.Field._storage.push item
 
+WoodPecker.Field.hasItem = (name)->
+  WoodPecker.Field.all().some (el)-> (el.name is name)
+
 WoodPecker.Field.sampleJSONHTML = ->
   WoodPecker.Field._sampleJSON().replace(/( )/gm,"&nbsp;").replace(/(\r\n|\n|\r)/gm,"<br />")
 
@@ -142,6 +170,10 @@ WoodPecker.Field.postField = (callback)->
   # [TODO]: avoid hard-coding
   $.post "http://0.0.0.0:9393/schemas" , {schema: WoodPecker.Field._toSchemaJSON()}, (data)->
     callback(data)
+
+# @mock
+WoodPecker.Field.fieldNames = ->
+  ["foo", "bar"]
 
 # @private
 
@@ -179,3 +211,6 @@ String.prototype.removeLineBreaks = ->
 
 String.prototype.removeSpaces = ->
   this.replace(/( )/gm, "")
+
+String.prototype.espaceDoubleQuotation = ->
+  this.replace(/"/g, "'")
