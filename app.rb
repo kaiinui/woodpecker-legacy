@@ -1,7 +1,6 @@
 Bundler.require
 
 require 'sinatra'
-require 'coffee-script'
 require 'sinatra/asset_pipeline'
 require_relative 'woodpecker/page'
 
@@ -15,7 +14,6 @@ get '/load' do
 end
 
 post '/schemas' do
-  puts params[:schema]
   # [TODO]: :domain or :pattern, how to set pattern?
   # [TODO]: save it in DynamoDB or SQS it.
   params[:schema].to_s

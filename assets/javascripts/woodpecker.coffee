@@ -44,6 +44,17 @@ WoodPecker.UI = {}
 
 # @public
 
+# [TODO] not used now.
+WoodPecker.UI.addHoverOverlayAt = (el)->
+  $el = $(el)
+  $offset = $el.offset()
+  $("<div class='wp-hover-overlay'>").css(
+    "left": $offset.left
+    "top": $offset.top
+    "width": $el.width()
+    "height": $el.height()
+  ).appendTo $("body")
+
 WoodPecker.UI.addOverlayAt = (el)->
   $el = $(el)
   $offset = $el.offset()
@@ -155,6 +166,7 @@ WoodPecker.Field._sampleJSON = ->
 # @extension
 
 Element.prototype.hasAnyTextAtRoot = ->
+  return true if this.nodeName == "IMG" or this.nodeName == "IFRAME"
   this.textAtRoot().removeSpaces() != ""
 
 Element.prototype.textAtRoot = ->
