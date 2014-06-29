@@ -2,12 +2,12 @@
   background: yellow;
   opacity: 0.5;
   box-shadow: "0 1px 2px rgba(0,0,0,.25)";
-  z-index: 23929393;
+  z-index: 1000;
   position: absolute;
 }
 .wp-input-field{
   position: absolute;
-  zIndex: 33929392;
+  zIndex: 1001;
   height: 20px;
 }
 
@@ -16,7 +16,7 @@
   boxShadow: "0 1px 2px rgba(0,0,0,.25)";
   color: white;
   position: absolute;
-  zIndex: 425343434;
+  z-index: 1002;
 }
 
 .wp-overlay-all{
@@ -27,12 +27,12 @@
   background: rgba(0,0,0,0.9);
   color: white;
   position: fixed;
-  z-index: 99999999999;
+  z-index: 10000;
   left: 0;
   top: 0;
   width: 100%;
   height: 100%;
-  span{
+  .wp-samplejson-code{
     display: table-cell;
     vertical-align: middle;
     padding-left: 100px;
@@ -43,6 +43,13 @@
     margin-bottom: 20px;
     margin-left: -20px;
   }
+  a.wp-button-post-schema{
+    display: block;
+    margin-left: -20px;
+    margin-top: 20px;
+    color: white;
+    font-size: 18px;
+  }
 }
 
 a.wp-button-show-sample{
@@ -51,7 +58,7 @@ a.wp-button-show-sample{
   color: white;
   text-decoration: none;
   position: fixed;
-  z-index: 9;
+  z-index: 1000;
   right: 20px;
   top: 20px;
 }
@@ -63,4 +70,16 @@ a.wp-button-close{
   right: 20px;
   color: white;
   text-decoration: none;
+}
+
+.fadeIn{
+  -webkit-animation: 0.3s ease-out fadeIn forwards;
+}
+@-webkit-keyframes fadeIn{
+  from{
+    -webkit-transform: scale(0.6);
+  }
+  to{
+    -webkit-transform: scale(1);
+  }
 }

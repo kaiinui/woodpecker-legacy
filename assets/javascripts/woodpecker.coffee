@@ -7,15 +7,14 @@ window.WoodPecker = {}
 
 # @public
 
+# [TODO]: <img> <iframe> should be treated specially
 WoodPecker.initalize = ->
   ["a", "p", "div", "span", "img", "iframe", "li", "dt", "dd", "h1", "h2", "h3", "h4", "h5", "h6"].forEach (elName)->
     WoodPecker._registElementEvents(elName)
-  WoodPecker.UI.addShowSampleJSONButton()
 
 # @private
 
 WoodPecker._registElementEvents = (elName)->
-  # [TODO] overlap element so that it doesn't mess original element.
   $$(elName).each (el)->
     return unless el.hasAnyTextAtRoot()
     el.on 'mouseover', (e)->
@@ -57,18 +56,25 @@ WoodPecker.UI.addOverlayAt = (el)->
   WoodPecker.UI._addFieldNameInputAt(el)
 
 WoodPecker.UI.addShowSampleJSONButton = ->
-  $("<a href='' class='wp-button-show-sample' />").text("Show").on('click', (e)->
+  return if $(".wp-button-show-sample").size() > 0
+  $("<a href='' class='wp-button-show-sample fadeIn' />").text("Show").on('click', (e)->
     e.preventDefault()
     WoodPecker.UI._showSampleJSON()
   ).appendTo $("body")
 
 # @private
 
+# [TODO] avoid jQuery, do it with Jade/Dust.
 WoodPecker.UI._showSampleJSON = ->
   json = WoodPecker.Field.sampleJSONHTML()
   $("<div id='_wp_samplejson_overlay' class='wp-overlay-all' />").append(
-    $("<span />").html(json).prepend(
+    $("<div class='wp-samplejson-code'/>").html(json).prepend(
       $("<h3 />").text("JSON")
+    ).append(
+      $("<a href='' class='wp-button-post-schema' />").text("OK").on 'click', (e)->
+        e.preventDefault()
+        WoodPecker.Field.postField (data)->
+          console.log data
     )
   ).append(
     $("<a href=''/>").addClass("wp-button-close").text("x").on('click', (e)->
@@ -76,8 +82,6 @@ WoodPecker.UI._showSampleJSON = ->
       $("#_wp_samplejson_overlay").remove()
     )
   ).appendTo $("body")
-
-# @private
 
 WoodPecker.UI._addFieldNameInputAt = (el)->
   $el = $(el)
@@ -94,6 +98,7 @@ WoodPecker.UI._addFieldNameInputAt = (el)->
       "name": name
       "xpath": getXPath(el).replace(/"/g, "'")
     )
+    WoodPecker.UI.addShowSampleJSONButton()
     WoodPecker.UI._addFieldNameLabelAt name, el
     $(this).remove()
   ).appendTo($("body")).focus()
@@ -106,7 +111,7 @@ WoodPecker.UI._addFieldNameLabelAt = (name, el)->
     "top": $offset.top - 10
   ).text(name).appendTo $("body")
 
-# @class WoodPecker.field
+# @class WoodPecker.Field
 
 WoodPecker.Field = {}
 WoodPecker.Field._storage = []
@@ -119,6 +124,14 @@ WoodPecker.Field.all = ->
 WoodPecker.Field.setItem = (item)->
   WoodPecker.Field._storage.push item
 
+WoodPecker.Field.sampleJSONHTML = ->
+  WoodPecker.Field._sampleJSON().replace(/( )/gm,"&nbsp;").replace(/(\r\n|\n|\r)/gm,"<br />")
+
+WoodPecker.Field.postField = (callback)->
+  # [TODO]: avoid hard-coding
+  $.post "http://0.0.0.0:9393/schemas" , {schema: WoodPecker.Field._toSchemaJSON()}, (data)->
+    callback(data)
+
 # @private
 
 WoodPecker.Field._toSchemaYAML = ->
@@ -130,16 +143,14 @@ WoodPecker.Field._toSchemaJSON = ->
   json = {}
   WoodPecker.Field.all().forEach (field)->
     json[field.name] = field.xpath
-  JSON.stringify json, null, 4
+  #JSON.stringify json, null, 4
+  json
 
-WoodPecker.Field.sampleJSON = ->
+WoodPecker.Field._sampleJSON = ->
   json = {}
   WoodPecker.Field.all().forEach (field)->
     json[field.name] = field.text
   JSON.stringify json, null, 4
-
-WoodPecker.Field.sampleJSONHTML = ->
-  WoodPecker.Field.sampleJSON().replace(/( )/gm,"&nbsp;").replace(/(\r\n|\n|\r)/gm,"<br />")
 
 # @extension
 

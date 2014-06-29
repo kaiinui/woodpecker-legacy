@@ -13,3 +13,10 @@ get '/load' do
   doc.preprocess
   doc.html
 end
+
+post '/schemas' do
+  puts params[:schema]
+  # [TODO]: :domain or :pattern, how to set pattern?
+  # [TODO]: save it in DynamoDB or SQS it.
+  params[:schema].to_s
+end
